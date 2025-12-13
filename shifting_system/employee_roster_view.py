@@ -75,7 +75,7 @@ class EmployeeRosterView(QWidget):
                 emp_shifts = self.db_manager.get_employee_shifts(emp[0]) or []
                 for s in emp_shifts:
                     # prepend employee name to shift rows
-                    shifts.append((emp[1] + ' ' + emp[2],) + s)
+                    shifts.append((emp[1] + ' ' + emp[2],) + tuple(s))
 
         # normalize rows: if employee name included, row structure differs
         self.table.setRowCount(len(shifts))
