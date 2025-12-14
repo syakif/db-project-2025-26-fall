@@ -13,6 +13,7 @@ from utils.auth import LoginDialog
 from shifting_system.manager_dashboard import ManagerDashboard
 from shifting_system.scheduler_interface import SchedulerInterface
 from shifting_system.employee_roster_view import EmployeeRosterView
+from attendance_system.leave_request_form import LeaveRequestForm
 
 from attendance_system.time_clock_dashboard import TimeClockDashboard
 
@@ -151,16 +152,14 @@ class MainWindow(QMainWindow):
     
     def load_screens(self):
         # employee screens (0-2)
-        # 0: Time Clock, 1: My Roster, 2: Leave Request (placeholder)
         self.time_clock = TimeClockDashboard(self.db_manager, self.user_data)
         self.stacked_widget.addWidget(self.time_clock)
 
         self.roster_view = EmployeeRosterView(self.db_manager, self.user_data)
         self.stacked_widget.addWidget(self.roster_view)
 
-        # leave request not yet implemented -> keep placeholder
-        placeholder = self.create_placeholder_widget(2)
-        self.stacked_widget.addWidget(placeholder)
+        self.leave_request = LeaveRequestForm(self.db_manager, self.user_data)
+        self.stacked_widget.addWidget(self.leave_request)
 
         # manager screens (3-6)
         self.manager_dashboard = ManagerDashboard(self.db_manager, self.user_data)
@@ -209,7 +208,7 @@ class MainWindow(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     
-    # initialize database
+    # start database
     db_manager = DatabaseManager()
     
     if not db_manager.connect():
