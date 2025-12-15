@@ -47,16 +47,18 @@ class EmployeeRosterView(QWidget):
         self.load_employees()
 
     def load_employees(self):
-        employees = self.db_manager.get_all_employees() or []
+        employees = self.db_manager.get_signed_in_employees() or []
         self.employee_combo.clear()
-        self.employee_combo.addItem('All Employees', None)
 
-        for emp in employees:
-            # emp: (employee_id, first_name, last_name, ...)
-            display = f"{emp[1]} {emp[2]} (ID: {emp[0]})"
-            self.employee_combo.addItem(display, emp[0])
+        if not employees:
+            self.employee_combo.addItem('No signed-in employees', None)
+        else:
+            for emp in employees:
+                # emp: (employee_id, first_name, last_name)
+                display = f"{emp[1]} {emp[2]} (ID: {emp[0]})"
+                self.employee_combo.addItem(display, emp[0])
 
-        # load all shifts by default
+        # load shifts for signed-in employees by default
         self.load_shifts(None)
 
     def on_employee_change(self, index):
@@ -70,7 +72,7 @@ class EmployeeRosterView(QWidget):
         else:
             # aggregate shifts for all employees by calling get_all_employees then per-employee
             shifts = []
-            employees = self.db_manager.get_all_employees() or []
+            employees = self.db_manager.get_signed_in_employees() or []
             for emp in employees:
                 emp_shifts = self.db_manager.get_employee_shifts(emp[0]) or []
                 for s in emp_shifts:
