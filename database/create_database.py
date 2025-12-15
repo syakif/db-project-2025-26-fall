@@ -28,7 +28,7 @@ def create_database():
         )
         cursor = conn.cursor()
         
-        # Create tables (from CREATE QUERIES.pdf)
+        # Create tables
         tables = [
             """CREATE TABLE WorkLocations (
                 location_id INT PRIMARY KEY IDENTITY(1,1),
@@ -78,6 +78,9 @@ def create_database():
                 start_date DATE NOT NULL,
                 end_date DATE NOT NULL,
                 is_published BIT DEFAULT 0
+
+                -- Constraint:
+                CONSTRAINT CK_WeeklySchedules_7Days CHECK (DATEDIFF(DAY, start_date, end_date) = 6)
             )""",
             """CREATE TABLE EmployeeAvailability (
                 availability_id INT PRIMARY KEY IDENTITY(1,1),
@@ -103,6 +106,9 @@ def create_database():
                 start_date DATE NOT NULL,
                 end_date DATE NOT NULL,
                 is_approved BIT DEFAULT 0
+
+                -- Constraint
+                CONSTRAINT CK_LeaveRequests_Dates CHECK (start_date <= end_date)
             )""",
             """CREATE TABLE AttendanceLogs (
                 log_id INT PRIMARY KEY IDENTITY(1,1),
@@ -110,12 +116,18 @@ def create_database():
                 date DATE DEFAULT CAST(GETDATE() AS DATE),
                 clock_in TIME,
                 clock_out TIME
+
+                -- Constraint:
+                CONSTRAINT CK_Attendance_ValidTime CHECK (clock_out > clock_in)
             )""",
             """CREATE TABLE BreakLogs (
                 break_id INT PRIMARY KEY IDENTITY(1,1),
                 log_id INT REFERENCES AttendanceLogs(log_id),
                 start_time TIME NOT NULL,
                 end_time TIME
+
+                -- Constraint:
+                CONSTRAINT CK_Break_TimeOrder CHECK (end_time > start_time)
             )"""
         ]
         
@@ -126,7 +138,7 @@ def create_database():
             except Exception as e:
                 print(f"Table creation warning: {e}")
         
-        # Insert sample data (from INSERT QUERIES.pdf)
+        # Insert sample data
         inserts = [
             "INSERT INTO WorkLocations (address) VALUES ('123 Tech Park, Building A'), ('456 Industrial Rd, Warehouse 1')",
             "INSERT INTO Skills (skill_name) VALUES ('Python Programming'), ('Project Management'), ('First Aid Certified')",
