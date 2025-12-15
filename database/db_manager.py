@@ -141,6 +141,17 @@ class DatabaseManager:
         """
         return self.execute_query(query, (employee_id,))
     
+    def get_signed_in_employees(self, today=None):
+        if today is None:
+            today = date.today()
+        query = """
+        SELECT e.employee_id, e.first_name, e.last_name
+        FROM Employees e
+        JOIN AttendanceLogs al ON e.employee_id = al.employee_id
+        WHERE al.date = ? AND al.clock_in IS NOT NULL AND al.clock_out IS NULL
+        ORDER BY e.last_name, e.first_name
+        """
+        return self.execute_query(query, (today,))
     # Attendance Logs
     def get_today_shift(self, employee_id, today=None):
         if today is None:
